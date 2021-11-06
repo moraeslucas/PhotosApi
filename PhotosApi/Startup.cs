@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using PhotosApi.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 
 namespace PhotosApi
 {
@@ -54,6 +55,12 @@ namespace PhotosApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors((policy) => policy.WithOrigins("http://localhost:3000")
+                                          .AllowAnyHeader()
+                                          .AllowAnyMethod()
+                                          .AllowCredentials()
+            );
 
             app.UseAuthorization();
 
