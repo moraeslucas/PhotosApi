@@ -22,9 +22,19 @@ namespace PhotosApi.Controllers
 
         // GET: api/Photos
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Photo>>> GetPhotos()
+        public async Task<ActionResult<IEnumerable<Photo>>> GetPhotos(int? skip, int? rowsNumber)
         {
-            return await _context.Photos.ToListAsync();
+            var photos = _context.Photos.AsQueryable();
+            //"OrderBy" separated to keep photos as IQueryable, avoiding more casts
+            photos = photos.OrderByDescending(pho => pho.Timestamp);
+
+            if (skip != null)
+                photos = photos.Skip((int)skip);
+            
+            if (rowsNumber != null)
+                photos = photos.Take((int)rowsNumber);
+
+            return await photos.ToListAsync();
         }
 
         // GET: api/Photos/5
