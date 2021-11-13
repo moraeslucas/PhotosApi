@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using PhotosApi.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Net.Http.Headers;
+using PhotosApi.Data;
 
 namespace PhotosApi
 {
@@ -29,11 +30,22 @@ namespace PhotosApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            /*Whenever a new context is requested, it will be returned from the context pool
+              if it's available; Otherwise a new context will be created*/
             services.AddDbContextPool<MyDatabaseContext>(
                 (options) => options.UseSqlServer (
                                 Configuration.GetConnectionString("MyDatabaseConnection")
                              )
             );
+
+            /* -According to ASP.NET Core docs, EF context (which is used inside PhotoDataAccess)
+             *  should be added to the services container using the Scoped lifetime.
+             *
+             * -Registers the IPhotoDataAccess interface with the concrete type PhotoDataAccess, which is the Dependency
+             *  Inversion Principle (DIP) primary concern (to ensure a class only depends upon higher-level abstractions)
+             *  PS: Broadly speaking, DIP decreases coupling
+             */
+            services.AddScoped<IPhotoDataAccess, PhotoDataAccess>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -56,7 +68,12 @@ namespace PhotosApi
 
             app.UseRouting();
 
-            app.UseCors((policy) => policy.WithOrigins("http://localhost:3000")
+            app.UseCors((policy) => policy.WithOrigins("http://localhost:3000",
+                                                       "http://photogallery.brazilsouth.azurecontainer.io",
+                                                       "https://photogalleryr1.azurewebsites.net",
+                                                       "https://photogalleryr2.azurewebsites.net",
+                                                       "http://photogalleryr2.azurewebsites.net",
+                                                       "http://photogallery-r2.brazilsouth.azurecontainer.io")
                                           .AllowAnyHeader()
                                           .AllowAnyMethod()
                                           .AllowCredentials()
