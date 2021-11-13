@@ -5,43 +5,44 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PhotosApi.Data;
 using PhotosApi.Models;
 
 namespace PhotosApi.Controllers
 {
+    //This application can be secured by uncommenting this "Authorize"
+    //[Authorize]
+
+    /*The token [controller] is replaced with the value
+      of the controller name, in this case 'Photos' */
     [Route("api/[controller]")]
     [ApiController]
-    public class PhotosController : ControllerBase
-    {
-        private readonly MyDatabaseContext _context;
+    public class PhotosController : ControllerBase/*ControllerBase doesn't have the view support, which is right
+                                                    for this application since its interface\view is in React */
 
-        public PhotosController(MyDatabaseContext context)
+    {
+        private readonly IPhotoDataAccess _iPhoto;
+
+        public PhotosController(IPhotoDataAccess iPhoto)
         {
-            _context = context;
+            //Uses DI to inject the database context into the controller.
+            _iPhoto = iPhoto;
         }
 
         // GET: api/Photos
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Photo>>> GetPhotos(int? skip, int? rowsNumber)
         {
-            var photos = _context.Photos.AsQueryable();
-            //"OrderBy" separated to keep photos as IQueryable, avoiding more casts
-            photos = photos.OrderByDescending(pho => pho.Timestamp);
+            var photos =  await _iPhoto.GetPhotosByFilter(skip, rowsNumber);
 
-            if (skip != null)
-                photos = photos.Skip((int)skip);
-            
-            if (rowsNumber != null)
-                photos = photos.Take((int)rowsNumber);
-
-            return await photos.ToListAsync();
+            return Ok(photos);
         }
 
         // GET: api/Photos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Photo>> GetPhoto(int id)
         {
-            var photo = await _context.Photos.FindAsync(id);
+            var photo = await _iPhoto.GetPhotoById(id);
 
             if (photo == null)
             {
@@ -61,11 +62,9 @@ namespace PhotosApi.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(photo).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _iPhoto.UpdatePhoto(photo);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -75,7 +74,7 @@ namespace PhotosApi.Controllers
                 }
                 else
                 {
-                    throw;
+                    return StatusCode(500);
                 }
             }
 
@@ -87,8 +86,7 @@ namespace PhotosApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Photo>> PostPhoto(Photo photo)
         {
-            _context.Photos.Add(photo);
-            await _context.SaveChangesAsync();
+            await _iPhoto.AddPhoto(photo);
 
             return CreatedAtAction("GetPhoto", new { id = photo.PhotoId }, photo);
         }
@@ -97,21 +95,20 @@ namespace PhotosApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePhoto(int id)
         {
-            var photo = await _context.Photos.FindAsync(id);
+            Photo photo = await _iPhoto.GetPhotoById(id);
             if (photo == null)
             {
                 return NotFound();
             }
 
-            _context.Photos.Remove(photo);
-            await _context.SaveChangesAsync();
+            await _iPhoto.DeletePhoto(photo);
 
             return NoContent();
         }
 
         private bool PhotoExists(int id)
         {
-            return _context.Photos.Any(e => e.PhotoId == id);
+            return _iPhoto.PhotoExists(id);  
         }
     }
 }
