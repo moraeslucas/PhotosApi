@@ -26,7 +26,7 @@ namespace PhotosApi.Data
             {
                 var photoQuery = _context.Photos.AsQueryable();
                 //"OrderBy" separated so photoQuery can remain IQueryable, avoiding more casts
-                photoQuery = photoQuery.OrderByDescending(pho => pho.Timestamp);
+                photoQuery = photoQuery.OrderByDescending(pho => pho.LastModified);
 
                 if (skip != null)
                     photoQuery = photoQuery.Skip((int)skip);
@@ -60,6 +60,8 @@ namespace PhotosApi.Data
         {
             try
             {
+                /*The LastModified column is changed by
+                  the Database whenever there is an Add.*/
                 _context.Photos.Add(photo);
                 return await _context.SaveChangesAsync();
             }
@@ -74,6 +76,10 @@ namespace PhotosApi.Data
         {
             try
             {
+                /*Another possibility is to create a Trigger to
+                  change the last modified time automatically*/
+                photo.LastModified = DateTime.Now;
+
                 _context.Entry(photo).State = EntityState.Modified;
                 return await _context.SaveChangesAsync();
             }

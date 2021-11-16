@@ -34,6 +34,8 @@ namespace PhotosApiTests.Controllers
         {
             // Arrange
             Photo fakePhoto = A.Fake<Photo>();
+            fakePhoto.LastModified = System.DateTime.Now;
+            fakePhoto.RowVersion = new byte[1];
 
             // Act
             PhotosController photosController = this.CreatePhotosController();
@@ -49,12 +51,10 @@ namespace PhotosApiTests.Controllers
             #region Arrange
             string imageLink = "image.jpg",
                    description = "test";
-            DateTime timestamp = DateTime.Now;
 
             Photo fakePhoto = A.Fake<Photo>();
             fakePhoto.ImageLink = imageLink;
             fakePhoto.Description = description;
-            fakePhoto.Timestamp = timestamp;
             #endregion
 
             // Act
@@ -66,7 +66,6 @@ namespace PhotosApiTests.Controllers
             //Since there are multiple asserts, there is a separated message for each one
             Assert.AreEqual(imageLink, photoResult.ImageLink, "ImageLink not equal");
             Assert.AreEqual(description, photoResult.Description, "Description not equal");
-            Assert.AreEqual(timestamp, photoResult.Timestamp, "Timestamp not equal");
         }
 
         [Test]
@@ -96,10 +95,11 @@ namespace PhotosApiTests.Controllers
 
             // Act
             PhotosController photosController = this.CreatePhotosController();
-            var result = await photosController.GetPhoto(_auxId);
+            var actionResult = await photosController.GetPhoto(_auxId);
 
             // Assert
-            Assert.AreEqual(fakePhoto.PhotoId, result.Value.PhotoId);
+            var result = ((OkObjectResult)actionResult.Result).Value as Photo;
+            Assert.AreEqual(fakePhoto.PhotoId, result.PhotoId);
         }
 
         [Test]
