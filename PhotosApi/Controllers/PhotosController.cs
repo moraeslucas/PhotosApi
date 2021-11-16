@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using PhotosApi.Data;
 using PhotosApi.Models;
 
@@ -25,7 +28,7 @@ namespace PhotosApi.Controllers
 
         public PhotosController(IPhotoDataAccess iPhoto)
         {
-            //Uses DI to inject the database context into the controller.
+            //Uses DI to inject the class that access the data source
             _iPhoto = iPhoto;
         }
 
@@ -49,11 +52,28 @@ namespace PhotosApi.Controllers
                 return NotFound();
             }
 
-            return photo;
+            /*This is the standard for implementing optimistic locking
+              in a RESTful API: To use the Etags and If-Match headers.
+              PS: I'm using the optimistic concurrency from EF instead*/
+            #region Etags & If-Match
+            /*These "const" are placed outside this method*/
+            //private const string _etagHeader = "ETag";
+            //private const string _IfMatchHeader = "If-Match";
+            
+            //var eTag = photo.RowVersion.ToString();
+            //HttpContext.Response.Headers.Add(_etagHeader, eTag);
+
+            //if (HttpContext.Request.Headers.ContainsKey(_IfMatchHeader) &&
+            //    HttpContext.Request.Headers[_IfMatchHeader] == eTag)
+            //{
+            //    return new StatusCodeResult(StatusCodes.Status304NotModified);
+            //}
+            #endregion
+
+            return Ok(photo);
         }
 
         // PUT: api/Photos/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPhoto(int id, Photo photo)
         {
@@ -82,7 +102,6 @@ namespace PhotosApi.Controllers
         }
 
         // POST: api/Photos
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Photo>> PostPhoto(Photo photo)
         {

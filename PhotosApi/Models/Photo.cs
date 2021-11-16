@@ -22,7 +22,11 @@ namespace PhotosApi.Models
         public string Description { get; set; }
 
         [Required]
-        [Column(TypeName = "datetime")]
-        public DateTime Timestamp { get; set; }
+        public DateTime LastModified { get; set; }
+
+        /*The attribute is called Timestamp because previous versions of SQL Server 
+          used a SQL timestamp data type before the SQL rowversion replaced it */
+        [Timestamp]
+        public byte[] RowVersion { get; set; }
     }
 }

@@ -348,9 +348,9 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
-PhotosApi/Properties/ServiceDependencies/PhotosApi - Zip Deploy/profile.arm.json
-PhotosApi/Properties/ServiceDependencies/PhotosApi - Zip Deploy/mssql1.arm.json
+
+# Publish folder
+/PhotosApi/Properties/ServiceDependencies
 PhotosApi/Properties/serviceDependencies.local.json
 PhotosApi/Properties/serviceDependencies.PhotosApi - Zip Deploy.json
-PhotosApi/Properties/ServiceDependencies/local/mssql1.arm.json
 PhotosApi/Properties/serviceDependencies.json

@@ -19,6 +19,15 @@ namespace PhotosApi.Models
         {
             modelBuilder.HasAnnotation("Relational:Collation", "SQL_Latin1_General_CP1_CI_AS");
 
+            modelBuilder.Entity<Photo>(entity =>
+            {
+                entity.Property(e => e.LastModified).HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.RowVersion)
+                    .IsRowVersion()
+                    .IsConcurrencyToken();
+            });
+
             OnModelCreatingPartial(modelBuilder);
         }
 
