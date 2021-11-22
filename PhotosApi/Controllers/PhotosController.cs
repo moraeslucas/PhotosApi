@@ -24,9 +24,9 @@ namespace PhotosApi.Controllers
                                                     for this application since its interface\view is in React */
 
     {
-        private readonly IPhotoDataAccess _iPhoto;
+        private readonly IPhotoRepository _iPhoto;
 
-        public PhotosController(IPhotoDataAccess iPhoto)
+        public PhotosController(IPhotoRepository iPhoto)
         {
             //Uses DI to inject the class that access the data source
             _iPhoto = iPhoto;
@@ -36,7 +36,7 @@ namespace PhotosApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Photo>>> GetPhotos(int? skip, int? rowsNumber)
         {
-            var photos =  await _iPhoto.GetPhotosByFilter(skip, rowsNumber);
+            var photos =  await _iPhoto.GetPhotosByFilterDesc(skip, rowsNumber);
 
             return Ok(photos);
         }
