@@ -16,12 +16,12 @@ namespace PhotosApiTests.Controllers
     public class PhotosControllerTests
     {
         const int _auxId = 5;
-        IPhotoDataAccess _fakeDataAccess;
+        IPhotoRepository _fakeDataAccess;
 
         [SetUp]
         public void SetUp()
         {
-            _fakeDataAccess = A.Fake<IPhotoDataAccess>();
+            _fakeDataAccess = A.Fake<IPhotoRepository>();
         }
 
         private PhotosController CreatePhotosController()
@@ -74,7 +74,7 @@ namespace PhotosApiTests.Controllers
             // Arrange
             var fakePhotos = A.CollectionOfDummy<Photo>(_auxId).AsEnumerable();
             // Set up a method call to return a specific result
-            A.CallTo(() => _fakeDataAccess.GetPhotosByFilter(0, _auxId)).Returns(Task.FromResult(fakePhotos));
+            A.CallTo(() => _fakeDataAccess.GetPhotosByFilterDesc(0, _auxId)).Returns(Task.FromResult(fakePhotos));
 
             // Act
             PhotosController photosController = this.CreatePhotosController();

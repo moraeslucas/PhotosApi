@@ -9,18 +9,20 @@ using System.Threading.Tasks;
 
 namespace PhotosApi.Data
 {
-    public class PhotoDataAccess : IPhotoDataAccess
+    public class PhotoRepository : IPhotoRepository
     {
         private readonly MyDatabaseContext _context;
-        private readonly ILogger<PhotoDataAccess> _logger;
+        private readonly ILogger<PhotoRepository> _logger;
 
-        public PhotoDataAccess(MyDatabaseContext context, ILogger<PhotoDataAccess> logger)
+        public PhotoRepository(MyDatabaseContext context, ILogger<PhotoRepository> logger)
         {
             _context = context;
             _logger = logger;
         }
 
-        public async Task<IEnumerable<Photo>> GetPhotosByFilter(int? skip, int? rowsNumber)
+        /* Depending on the app's size, the pattern 'Query Specification' could be used, since it's designed
+           as the place where the definitions of a query (optional sorting and paging logic) can be put   */
+        public async Task<IEnumerable<Photo>> GetPhotosByFilterDesc(int? skip, int? rowsNumber)
         {
             try
             {

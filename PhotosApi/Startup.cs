@@ -45,7 +45,7 @@ namespace PhotosApi
              *  Inversion Principle (DIP) primary concern (to ensure a class only depends upon higher-level abstractions)
              *  PS: Broadly speaking, DIP decreases coupling
              */
-            services.AddScoped<IPhotoDataAccess, PhotoDataAccess>();
+            services.AddScoped<IPhotoRepository, PhotoRepository>();
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -69,6 +69,7 @@ namespace PhotosApi
             app.UseRouting();
 
             app.UseCors((policy) => policy.WithOrigins("http://localhost:3000",
+                                                       "https://localhost:44356",
                                                        "http://photogallery.brazilsouth.azurecontainer.io",
                                                        "https://photogalleryr1.azurewebsites.net",
                                                        "https://photogalleryr2.azurewebsites.net",

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace PhotosApi.Data
 {
-    public interface IPhotoDataAccess
+    public interface IPhotoRepository
     {
         Task<int> AddPhoto(Photo photo);
-        Task<IEnumerable<Photo>> GetPhotosByFilter(int? skip, int? rowsNumber);
+        Task<IEnumerable<Photo>> GetPhotosByFilterDesc(int? skip, int? rowsNumber);
         Task<Photo> GetPhotoById(int id);
         Task<int> UpdatePhoto(Photo photo);
         Task<int> DeletePhoto(Photo photo);
